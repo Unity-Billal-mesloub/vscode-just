@@ -8,6 +8,7 @@ import {
 
 import { EXTENSION_NAME, SETTINGS } from './const';
 import { getLogger } from './logger';
+import { workspaceRoot } from './utils';
 
 const LOGGER = getLogger();
 
@@ -37,6 +38,9 @@ export const createLanguageClient = async (): Promise<LanguageClient | null> => 
   const serverOptions: ServerOptions = {
     command: lspPath,
     args: [],
+    options: {
+      cwd: workspaceRoot(),
+    },
   };
 
   const clientOptions: LanguageClientOptions = {
@@ -76,7 +80,10 @@ export const stopLanguageClient = async (): Promise<void> => {
 
 const checkLspAvailability = (lspPath: string): Promise<boolean> => {
   return new Promise((resolve) => {
-    const process = spawn(lspPath, ['--version'], { stdio: 'ignore' });
+    const process = spawn(lspPath, ['--version'], {
+      stdio: 'ignore',
+      cwd: workspaceRoot(),
+    });
 
     process.on('close', (code: number) => {
       resolve(code === 0);
